@@ -90,7 +90,7 @@
 <meta property="og:url" content="http://jaychouchou.github.io/2016/12/27/java设计模式之代理模式/index.html">
 <meta property="og:site_name" content="xiaoah's blog">
 <meta property="og:description" content="代理模式是java设计模式中最常见的模式之一,它的定义是：为其他对象提供一种代理以控制对这个对象的访问。很多地方用到了代理模式，例如spring中的aop（通过预编译方式和运行期动态代理实现程序功能的统一维护），jdk中的proxy都是代理模式。代理模式中涉及到很多java的基础知识，其中主要的是java的三大特性之一：多态。">
-<meta property="og:updated_time" content="2016-12-27T12:48:24.027Z">
+<meta property="og:updated_time" content="2016-12-31T08:09:22.039Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java设计模式之代理模式">
 <meta name="twitter:description" content="代理模式是java设计模式中最常见的模式之一,它的定义是：为其他对象提供一种代理以控制对这个对象的访问。很多地方用到了代理模式，例如spring中的aop（通过预编译方式和运行期动态代理实现程序功能的统一维护），jdk中的proxy都是代理模式。代理模式中涉及到很多java的基础知识，其中主要的是java的三大特性之一：多态。">
@@ -414,7 +414,7 @@
 <ul>
 <li><strong>封装</strong>：封装隐藏了类的内部实现机制，可以在不影响使用的情况下改变类的内部结构，同时也保护了数据。对外界而言它的内部细节是隐藏的，暴露给外界的只是它的访问方法</li>
 <li><strong>继承</strong>：为了实现代码的复用，子类继承父类，继承后子类自动拥有了父类的属性和方法（私有属性和构造方法不能被继承）</li>
-<li><strong>多态</strong>：父类的引用变量指向子类的对象，由该引用变量发出的行为，会由子类的不同特性，而有不同结果。<h3 id="多态的条件"><a href="#多态的条件" class="headerlink" title="多态的条件"></a>多态的条件</h3>多态存在的条件有三个：<strong>继承</strong>，<strong>重写</strong>（子类对父类中的方法进行重新定义），<strong>向上转型</strong>（父类引用指向子类的对象）<br><strong>运行规则是</strong>：<br>  当父类引用指向子类的对象时，通过该引用变量能调用父类中的所有方法（可以私有的也可以公有的）。但是如果某个方法被该子类重写了（覆盖了），那么实际执行的是子类中的方法。这就是多态。<h3 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h3>如果继承关系是父子孙三代关系，条件是由子类向上转型到父类，而某一方法子类重写了父类，孙类也重写了子类，此时父类执行该方法时，执行的是子类中的方法，因为是由子类向上转型的。不能执行到孙类中去。若是孙类向上转型到父类，此时只有子类重写了某一方法，那么也会调用到该子类，若果孙类也重写了，就调用孙类中的。（表达的不够清楚，可以自己写个demo试一下）<h2 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h2><strong>代理模式定义</strong>：为其它对象提供一种代理以控制对这个对象的访问。<br>代理模式主要涉及到三个角色:</li>
+<li><strong>多态</strong>：父类的引用变量指向子类的对象，由该引用变量发出的行为，会由子类的不同特性，而有不同结果。<h3 id="多态的条件"><a href="#多态的条件" class="headerlink" title="多态的条件"></a>多态的条件</h3>多态存在的条件有三个：<strong>继承</strong>，<strong>重写</strong>（子类对父类中的方法进行重新定义），<strong>向上转型</strong>（父类引用指向子类的对象）<br><strong>运行规则是</strong>：<br>  当父类引用指向子类的对象时，通过该引用变量能调用父类中的所有方法（可以私有的也可以公有的）。但是如果某个方法被该子类重写了（覆盖了），那么实际执行的是子类中的方法。这就是多态。<h3 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h3>如果继承关系是父子孙三代关系，条件是由子类向上转型到父类，而某一方法子类重写了父类，孙类也重写了子类，此时父类执行该方法时，执行的是子类中的方法，因为是由子类向上转型的。不能执行到孙类中去。若是孙类向上转型到父类，此时只有子类重写了某一方法，那么也会调用到该子类，若果孙类也重写了，就调用孙类中的。<h2 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h2><strong>代理模式定义</strong>：为其它对象提供一种代理以控制对这个对象的访问。<br>代理模式主要涉及到三个角色:</li>
 <li><strong>抽象角色</strong>：真实对象和代理对象的共同接口</li>
 <li><strong>代理角色</strong>：提供代理的类。</li>
 <li><strong>真实角色</strong>：代理角色所代表的真实对象。<br>其实代理模式就是多态的运用。代理角色和真实角色都继承抽象角色，在抽象角色中声明要执行的方法，例如eat（）方法，然后由真实角色和代理角色去重写，而在真实角色中写具体的处理过程。在代理角色重写的eat（）方法中调用的是通过父类对象调用eat（）方法，此时，父类的方法并没有具体实现，所以这里就涉及到向上转型，如果该父类对象是由真实角色向上转型的，此时调用的就是真实角色中的eat方法。这样做就实现了代理功能。这个代理角色能够代理很多种这一类真实角色，因为父类对象都是由不同的真实角色向上转型而来。这样的好处是以一个代理角色来处理很多类似的真实角色。不同的处理方式就会衍生出不同的代理，例如</li>
@@ -497,6 +497,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2016/12/31/jdk-jre-jvm三者的区别/" rel="prev" title="jdk，jre，jvm三者之间的区别">
+                jdk，jre，jvm三者之间的区别 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -576,7 +580,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-count">4</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -593,7 +597,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
