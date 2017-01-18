@@ -1,0 +1,917 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mysql," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="这一篇主要是总结一下mysql数据库的CURD操作（代表创建（Create）、更新（Update）、读取（Retrieve）和删除（Delete）操作。CURD 定义了用于处理数据的基本原子操作）。inset，update，delete，select这几个主要关键字的使用，查询结果的排序和分组，子查询和连接的使用，mysql的运算符和函数以及如何自定义函数和存储过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql知识总结——重点篇">
+<meta property="og:url" content="http://jaychouchou.github.io/2017/01/05/mysql_02/index.html">
+<meta property="og:site_name" content="xiaoah's blog">
+<meta property="og:description" content="这一篇主要是总结一下mysql数据库的CURD操作（代表创建（Create）、更新（Update）、读取（Retrieve）和删除（Delete）操作。CURD 定义了用于处理数据的基本原子操作）。inset，update，delete，select这几个主要关键字的使用，查询结果的排序和分组，子查询和连接的使用，mysql的运算符和函数以及如何自定义函数和存储过程。">
+<meta property="og:updated_time" content="2017-01-17T04:34:54.662Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql知识总结——重点篇">
+<meta name="twitter:description" content="这一篇主要是总结一下mysql数据库的CURD操作（代表创建（Create）、更新（Update）、读取（Retrieve）和删除（Delete）操作。CURD 定义了用于处理数据的基本原子操作）。inset，update，delete，select这几个主要关键字的使用，查询结果的排序和分组，子查询和连接的使用，mysql的运算符和函数以及如何自定义函数和存储过程。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 'undefined',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'K3HWGN3K1L',
+      apiKey: 'f970bfc3033e4043e8e91a76d6ca2be1',
+      indexName: 'xiaoanhua',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jaychouchou.github.io/2017/01/05/mysql_02/"/>
+
+
+
+
+
+  <title> mysql知识总结——重点篇 | xiaoah's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?3f968faf15df4189ab27dc1b3b800456";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta custom-logo">
+  
+    <div class="site-meta-headline">
+      <a>
+        <img class="custom-logo-image" src="/images/logo.png"
+             alt="xiaoah's blog"/>
+      </a>
+    </div>
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">xiaoah's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">teemo is coming</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+                <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+ <div class="algolia-popup popup">
+   <div class="algolia-search">
+     <div class="algolia-search-input-icon">
+       <i class="fa fa-search"></i>
+     </div>
+     <div class="algolia-search-input" id="algolia-search-input"></div>
+   </div>
+   <div class="algolia-results">
+     <div id="algolia-stats"></div>
+     <div id="algolia-hits"></div>
+     <div id="algolia-pagination" class="algolia-pagination"></div>
+   </div>
+   <span class="popup-btn-close">
+     <i class="fa fa-times-circle"></i>
+   </span>
+ </div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://jaychouchou.github.io/2017/01/05/mysql_02/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="xiaoah">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1483281477&di=0c766f92ac4878b33f63652c94b7e81e&imgtype=jpg&er=1&src=http%3A%2F%2Fimg1.dwstatic.com%2Flol%2F1512%2F315320556654%2F1451366964489.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="xiaoah's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="xiaoah's blog" src="/images/logo.png">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                mysql知识总结——重点篇
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T00:00:00+08:00">
+                2017-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <a href="/2017/01/05/mysql_02/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/05/mysql_02/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一篇主要是总结一下mysql数据库的CURD操作（代表创建（Create）、更新（Update）、读取（Retrieve）和删除（Delete）操作。CURD 定义了用于处理数据的基本原子操作）。inset，update，delete，select这几个主要关键字的使用，查询结果的排序和分组，子查询和连接的使用，mysql的运算符和函数以及如何自定义函数和存储过程。<br><a id="more"></a></p>
+<h2 id="记录的操作"><a href="#记录的操作" class="headerlink" title="记录的操作"></a>记录的操作</h2><h3 id="inset插入操作"><a href="#inset插入操作" class="headerlink" title="inset插入操作"></a>inset插入操作</h3><p>mysql表中使用insert into语句来插入数据。有三种插入记录的语法</p>
+<ol>
+<li>insert [into] tal_name [(col_name,…)] {values|value}} ({expr|default},…),(…),…<blockquote>
+<p>注意：(1)如果给自动编号的字段赋值可以采用null或default，(2)插入的值可以采用表达式或函数。</p>
+</blockquote>
+</li>
+</ol>
+<p>例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">mysql&gt; desc tb1;</div><div class="line">+-----------+----------------------+------+-----+-------------+----------------+</div><div class="line">| Field     | Type                 | Null | Key | Default     | Extra          |</div><div class="line">+-----------+----------------------+------+-----+-------------+----------------+</div><div class="line">| id        | smallint(5) unsigned | NO   | PRI | NULL        | auto_increment |</div><div class="line">| sex       | enum(&apos;1&apos;,&apos;2&apos;,&apos;3&apos;)    | YES  |     | 3           |                |</div><div class="line">| username1 | varchar(30)          | NO   |     | jaychouchou |                |</div><div class="line">+-----------+----------------------+------+-----+-------------+----------------+</div><div class="line">3 rows in set (0.05 sec)</div><div class="line"></div><div class="line">mysql&gt; select * from tb1;</div><div class="line">Empty set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt; insert tb1 values(null,default,&apos;张三&apos;),(default,null,&apos;李四&apos;);</div><div class="line">Query OK, 2 rows affected (0.05 sec)</div><div class="line">Records: 2  Duplicates: 0  Warnings: 0</div><div class="line"></div><div class="line">mysql&gt; select * from tb1;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  1 | 3    | 张三      |</div><div class="line">|  2 | NULL | 李四      |</div><div class="line">+----+------+-----------+</div><div class="line">2 rows in set (0.00 sec)</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure></p>
+<ol>
+<li><p>insert [into] tbl_name set col_name={expro|default}，col2_name={expro|default},…</p>
+<blockquote>
+<p>说明：(1)该方式一次只能插入一条数据，(2)此方法可以使用子查询。</p>
+</blockquote>
+</li>
+<li><p>inset [into] tbl_name [(col_name,…)] select …</p>
+<blockquote>
+<p>说明：该方法可以将查询结果插入到指定数据表。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="update更新操作"><a href="#update更新操作" class="headerlink" title="update更新操作"></a>update更新操作</h3><p>如果需要修改或更新mysql中的数据，我们可以使用update命令来操作。</p>
+<blockquote>
+<p>sql语法(这是单表更新，学习了join语句之后可以进行多表更新)：</p>
+</blockquote>
+<p>update [low_priority] [ignore] table_reference set col_name={expro|default}[,col2_name={expro|default}]…[where where_condition]</p>
+<ol>
+<li>可以同时更新一个字段或多个字段</li>
+<li>可以在wher子句中指定条件，如果省略where条件将更新所有记录。<br>例：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">mysql&gt; update tb1 set sex=sex-1,username1=&apos;王二&apos; where id=1;</div><div class="line">Query OK, 1 row affected (0.05 sec)</div><div class="line">Rows matched: 1  Changed: 1  Warnings: 0</div><div class="line"></div><div class="line">mysql&gt; select * from tb1;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  1 | 2    | 王二      |</div><div class="line">|  2 | NULL | 李四      |</div><div class="line">+----+------+-----------+</div><div class="line">2 rows in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="delete删除操作"><a href="#delete删除操作" class="headerlink" title="delete删除操作"></a>delete删除操作</h3><p>可以使用delete from 命令来删除mysql数据表中的记录。</p>
+<blockquote>
+<p>sql语法(这是单表删除，学习了join语句之后可以进行多表删除)：</p>
+</blockquote>
+<p>delete from tbl_name [where where_condition]</p>
+<ol>
+<li>如果省略where条件所有记录将被删除。</li>
+<li>可以在where中指定删除条件。<br>例：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">mysql&gt; delete from tb1 where sex=2;</div><div class="line">Query OK, 1 row affected (0.03 sec)</div><div class="line"></div><div class="line">mysql&gt; select * from tb1;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  2 | NULL | 李四      |</div><div class="line">+----+------+-----------+</div><div class="line">1 row in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="select查找操作"><a href="#select查找操作" class="headerlink" title="select查找操作"></a>select查找操作</h3><p>mysql中使用select来查询数据表中的记录。</p>
+<blockquote>
+<p>sql语法</p>
+</blockquote>
+<p>SELECT select_expr[,select_expr]<br>[<br>  FROM table_reference<br>  [WHERE where_condition]<br>  [GROUP BY {col_name|position} [ASC|DESC],…]<br>  [HAVING where_condition]<br>  [ORDER BY {col_name|expr|position} [ASC|DESC],…]<br>  [LIMIT {[OFFSET,] row_count|row_count OFFSET offset}]<br>]<br>例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mysql&gt; select id as 编号, username1 as 用户名 from tb1 where id=2;</div><div class="line">+--------+-----------+</div><div class="line">| 编号   | 用户名    |</div><div class="line">+--------+-----------+</div><div class="line">|      2 | 李四      |</div><div class="line">+--------+-----------+</div><div class="line">1 row in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="where"><a href="#where" class="headerlink" title="where"></a>where</h4><p>如果我们想再MySQL数据表中读取指定的数据，WHERE 子句是非常有用的。使用主键来作为 WHERE 子句的条件查询是非常快速的。如果给定的条件在表中没有任何匹配的记录，那么查询不会返回任何数据。<br>where条件表达式：对记录进行过滤，若果没有指定where子句，则显示所有记录，在where表达式中，可以使用mysql支持的函数或运算符。可以使用AND或者OR指定一个或多个条件。</p>
+<h4 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h4><p>GROUP BY 语句根据一个或多个列对结果集进行分组，ASC升序（默认）DESC降序。在分组的列上我们可以使用 COUNT, SUM, AVG,等函数。HAVING指定分组的条件，条件的字段必须在查询之中。<br>例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">mysql&gt; select sex,username1 from tb1 group by sex,username1 having sex&lt;3;</div><div class="line">+------+-----------+</div><div class="line">| sex  | username1 |</div><div class="line">+------+-----------+</div><div class="line">| 1    | alice     |</div><div class="line">| 1    | bob       |</div><div class="line">| 2    | tom       |</div><div class="line">+------+-----------+</div><div class="line">3 rows in set (0.00 sec)</div><div class="line">mysql&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>如果我们需要对读取的数据进行排序，我们就可以使用mysql的order by 子句来设定你想按哪个字段哪种方式来进行排序，再返回搜索结果。<br>例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">mysql&gt; select * from tb1 order by sex desc;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  6 | 2    | tom       |</div><div class="line">|  7 | 1    | alice     |</div><div class="line">|  8 | 1    | bob       |</div><div class="line">|  2 | NULL | 李四      |</div><div class="line">+----+------+-----------+</div><div class="line">4 rows in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="limit"><a href="#limit" class="headerlink" title="limit"></a>limit</h4><p>limit语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">LIMIT count|</div><div class="line">LIMIT [offset,]count|</div><div class="line">LIMIT count OFFSET offset</div></pre></td></tr></table></figure><br>LIMIT子句用于限制指定的sql语句中服务器所返回的行数，对于select语句而言，它限制在结果集中返回的行数，在update语句中，它限制被修改行的数目，在delete语句中，它限制被删除行的数目，除了delete语句仅允许上面显示的第一条语法外，其他语句都支持上面的三条语法。<br>limit子句只接受文字值，而表达式或变量都不接受，另外，它不接受负值，限制行数的最直接方式是指定要显示的最他行数，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from tb1</div><div class="line">limit 2;</div></pre></td></tr></table></figure><br>在某一指定行数的后面开始列举行数，我们可以指定偏移量（offset）初始行的偏移量为0，使用这两个偏移量可以完成这项工作：一个指定偏移量的初始值，后面跟着逗号，接着指定要显示的最大数目，其他指定的数量接在OFFSET关键字后面，用以指定偏移量的值，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from tb1</div><div class="line">limit 1,3;</div></pre></td></tr></table></figure><br>在这个示例中，在到达第1条记录后，将会返回最后的3条记录————也就是说返回第2条至第4条记录，limit子句的偏移量和计数是基于结果集中的行数，而不一定是表中的行数，因此，偏移量的数量与基于检索表的子句的命令有关，如where子句和order by子句。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">mysql&gt; select * from tb1;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  2 | NULL | 李四      |</div><div class="line">|  6 | 2    | tom       |</div><div class="line">|  7 | 1    | alice     |</div><div class="line">|  8 | 1    | bob       |</div><div class="line">+----+------+-----------+</div><div class="line">4 rows in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt; select * from tb1 limit 1,2;</div><div class="line">+----+------+-----------+</div><div class="line">| id | sex  | username1 |</div><div class="line">+----+------+-----------+</div><div class="line">|  6 | 2    | tom       |</div><div class="line">|  7 | 1    | alice     |</div><div class="line">+----+------+-----------+</div><div class="line">2 rows in set (0.00 sec)</div><div class="line"></div><div class="line">mysql&gt;</div></pre></td></tr></table></figure><br>limit 1,2,表示从结果集下标为1的数据开始取，取2个。下标从0开始计数。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/weixin.jpg" alt="xiaoah wechat" style="width: 200px; max-width: 100%;"/>
+    <div>请关注我的个人订阅号</div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div></div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/uploads/pay.png" alt="xiaoah WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/03/mysql_01/" rel="next" title="mysql知识总结——基础篇">
+                <i class="fa fa-chevron-left"></i> mysql知识总结——基础篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/01/05/mysql_02/"
+           data-title="mysql知识总结——重点篇" data-url="http://jaychouchou.github.io/2017/01/05/mysql_02/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1483281477&di=0c766f92ac4878b33f63652c94b7e81e&imgtype=jpg&er=1&src=http%3A%2F%2Fimg1.dwstatic.com%2Flol%2F1512%2F315320556654%2F1451366964489.jpg"
+               alt="xiaoah" />
+          <p class="site-author-name" itemprop="name">xiaoah</p>
+          <p class="site-description motion-element" itemprop="description">teemo is coming</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jaychouchou" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3947153759" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.baidu.com/" title="Title" target="_blank">Title</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#记录的操作"><span class="nav-number">1.</span> <span class="nav-text">记录的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#inset插入操作"><span class="nav-number">1.1.</span> <span class="nav-text">inset插入操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update更新操作"><span class="nav-number">1.2.</span> <span class="nav-text">update更新操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#delete删除操作"><span class="nav-number">1.3.</span> <span class="nav-text">delete删除操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#select查找操作"><span class="nav-number">1.4.</span> <span class="nav-text">select查找操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#where"><span class="nav-number">1.4.1.</span> <span class="nav-text">where</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分组"><span class="nav-number">1.4.2.</span> <span class="nav-text">分组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排序"><span class="nav-number">1.4.3.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#limit"><span class="nav-number">1.4.4.</span> <span class="nav-text">limit</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">xiaoah</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"xiaoanhua"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.0"></script>
+
+
+
+   
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script type="text/javascript" src="/js/src/algolia_search.js?v=5.1.0"></script>
+
+
+ 
+
+</body>
+</html>
